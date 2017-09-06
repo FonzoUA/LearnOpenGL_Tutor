@@ -1,0 +1,81 @@
+// Vertex shader 
+	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);												// Create a shader object
+	glShaderSource(vertexShader, 1, &VertexShaderSource, nullptr);										// Attach shader source code to the shader object 
+																										// [Parameters] First: shader to compile. Second: Specify how many strings are being passed
+																										// as a source code. Third: actual source code reference. 
+	glCompileShader(vertexShader);																		// Compile the shader
+																										/*  First create an empty shader object and assign its ID to unsigned int (done with 'glCreateShader()'
+																											Since vertex shader is being created, pass in GL_VERTEX_SHADER as parameter. Next attach the
+																											shader source code to the shader object and compile the shader*/
+	
+	// Check for compilation errors
+	int success;																						// Indicates success status
+	char infoLog[512];																					// Stores error messages
+	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);											// Checks if compilation was successful
+	if (!success)																						
+	{	
+		glGetShaderInfoLog(vertexShader, 512, nullptr, infoLog);										// Retrieve error message
+		printf("Error::Shader::Vertex::Compilation_failed\n");
+	}
+
+	// Fragment shader
+	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader, 1, &FragmentShaderSource, nullptr);
+	glCompileShader(fragmentShader);
+
+	// Check for compilation errors
+	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+	if (!success)
+	{
+		glGetShaderInfoLog(fragmentShader, 512, nullptr, infoLog);										
+		printf("Error::Shader::Fragment::Compilation_failed\n");
+	}
+
+	// Alt Fragment Shader
+	unsigned int altFragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(altFragmentShader, 1, &AltFragmentShaderSource, nullptr);
+	glCompileShader(altFragmentShader);
+	glGetShaderiv(altFragmentShader, GL_COMPILE_STATUS, &success);
+	if (!success)
+	{
+		glGetShaderInfoLog(altFragmentShader, 512, nullptr, infoLog);
+		printf("Error::Shader::AltFragment::Compilation_failed\n");
+	}
+
+	// Link Shaders
+	int shaderProgramOrange = glCreateProgram();																// Creates a program object
+																										/*	A shader program object is the final linked version of multiple shaders combined. In order
+																											for compiled shaders to be used, they have to be linked to a shader program object which then
+																											is activated when objects are rendered. Activated shader program's shaders will be used when
+																											render calls are issued.
+																											When linking the shaders into a program it links the output of each shader to the input of the
+																											next shader. This would give linkining errors if outputs and inputs do not match*/
+	int shaderProgramYellow = glCreateProgram();
+
+	glAttachShader(shaderProgramOrange, vertexShader);
+	glAttachShader(shaderProgramOrange, fragmentShader);
+	glLinkProgram(shaderProgramOrange);
+	// Check for linking errors
+	glGetProgramiv(shaderProgramOrange, GL_LINK_STATUS, &success);
+	if (!success)
+	{
+		glGetProgramInfoLog(shaderProgramOrange, 512, nullptr, infoLog);
+		printf("Error::ShaderOrange::Program::Linking_failed\n");
+	}
+
+	glAttachShader(shaderProgramYellow, vertexShader);
+	glAttachShader(shaderProgramYellow, altFragmentShader);
+	glLinkProgram(shaderProgramYellow);
+	// Check for linking errors
+	glGetProgramiv(shaderProgramYellow, GL_LINK_STATUS, &success);
+	if (!success)
+	{
+		glGetProgramInfoLog(shaderProgramYellow, 512, nullptr, infoLog);
+		printf("Error::ShaderYellow::Program::Linking_failed\n");
+	}
+	
+
+	// Delete the shader objects once they've been linked into the program object
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
+	
